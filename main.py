@@ -1,8 +1,7 @@
 from db.db import DatabaseManager
 from user import User
 from menu import Menu, MenuItem
-#from parser import Parser
-import pdb # отладка
+from helpers import Helper  # Импортируем класс Helper для очистки экрана
 
 
 class Application:
@@ -10,13 +9,12 @@ class Application:
         self.db_manager = DatabaseManager()  # Создаем объект для управления базой данных
         self.session = None
         self.user = User()
-        self.parser = None
         self.menu = None
+        self.helper = Helper()  # Создаем объект Helper для очистки экрана
 
     def initialize(self):
         """Инициализация базы данных и всех компонентов."""
         self.session = self.db_manager.initialize_db()  # Инициализируем базу данных
-        #self.parser = Parser(self.session)  # Передаем сессию в парсер
 
     def authorize_user(self):
         """Авторизация пользователя."""
@@ -26,27 +24,25 @@ class Application:
 
     def setup_menu(self):
         """Настраиваем меню для приложения."""
-        # Создаем экземпляр класса Menu без меню
-        self.menu = Menu(root_menu=None)
-
-        # Теперь создаем main_menu с передачей метода show_message из объекта self.menu
+        # Создаем главное меню
         main_menu = MenuItem("Главное меню", sub_menu=[
             MenuItem("Анализ сайта", sub_menu=[
-                MenuItem("Установить страницу", self.menu.show_message),
-                MenuItem("Анализ CSS", self.menu.show_message),
-                MenuItem("Анализ JS", self.menu.show_message)
+                MenuItem("Установить страницу", self.show_message),
+                MenuItem("Анализ CSS", self.show_message),
+                MenuItem("Анализ JS", self.show_message)
             ]),
-            MenuItem("Обработать сайт полностью", self.menu.show_message)
+            MenuItem("Обработать сайт полностью", self.show_message)
         ])
 
-        # Теперь присваиваем созданное меню как root_menu в объекте self.menu
-        self.menu.root_menu = main_menu
+        # Инициализируем объект Menu с главным меню
+        self.menu = Menu(root_menu=main_menu)
 
-
+    def show_message(self):
+        """Пример действия для меню."""
+        print("Этот метод был вызван!")
+        input("Нажмите Enter для продолжения...")
 
     def run(self):
-
-
         """Запуск приложения."""
         # Инициализация
         self.initialize()
@@ -54,10 +50,34 @@ class Application:
         self.authorize_user()
         # Настройка меню
         self.setup_menu()
-        # Запуск меню
-        self.menu.navigate(self.session)
+
+        current_menu = self.menu.root_menu  # Начинаем с главного меню
+        previous_menus = []  # Стек для хранения предыдущих уровней меню
+
+        # Основной цикл приложения
+        while True:
+            result = self.menu.navigate(current_menu)
+
+            if result == 'exit':
+                # Если 0 было выбрано в главном меню — выход из программы
+                if not previous_menus:
+                    break
+                else:
+                    # Если в подменю выбрали 0, возвращаемся на предыдущий уровень
+                    current_menu = previous_menus.pop()
+                    continue
+            elif isinstance(result, MenuItem):
+                if result.is_leaf():
+                    # Если выбранный элемент — лист (нет подменю), то выполняем действие
+                    result.run()
+                else:
+                    # Сохраняем текущее меню в стек и переходим в подменю
+                    previous_menus.append(current_menu)
+                    current_menu = result
+
         # Закрытие сессии после завершения
         self.db_manager.close_session(self.session)
+
 
 if __name__ == "__main__":
     app = Application()

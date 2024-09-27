@@ -10,6 +10,7 @@ class Helper:
         # Установим кодировку
         pass
 
+    @staticmethod
     def clear_screen():
         """Очищает экран, в зависимости от операционной системы."""
         os.system('cls' if os.name == 'nt' else 'clear')

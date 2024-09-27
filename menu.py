@@ -7,25 +7,21 @@ class MenuItem:
         self.sub_menu = sub_menu
 
     def is_leaf(self):
-        """Проверка, является ли элемент конечным."""
         return self.sub_menu is None
 
     def run(self):
-        """Запуск действия, если элемент конечный."""
         if self.is_leaf():
             if self.action:
                 self.action()
         else:
-            print("Это не конечный элемент, невозможно запустить действие.")
+            self.show_sub_menu()  # Передаём breadcrumb при вызове
 
     def show_sub_menu(self, breadcrumb):
-        """Отображение подменю."""
         Helper.clear_screen()
         print(breadcrumb)  # Выводим навигационную цепочку
         for i, item in enumerate(self.sub_menu):
             print(f"{i + 1}. {item.name}")
         print(f"0. Назад")
-
 
 class Menu:
     def __init__(self, root_menu, is_root=True, breadcrumb="Главное меню"):
@@ -37,8 +33,8 @@ class Menu:
         """Навигация по меню."""
         while True:
             Helper.clear_screen()
-            print(self.breadcrumb)  # Выводим навигационную цепочку
-            self.root_menu.show_sub_menu(self.breadcrumb)  # Показываем подменю
+            print(self.breadcrumb)  # Выводим текущую навигационную цепочку
+            self.root_menu.show_sub_menu(self.breadcrumb)  # Передаём breadcrumb
             choice = input("Выберите действие: ")
 
             if choice.isdigit():
@@ -46,7 +42,7 @@ class Menu:
                 if choice == 0:
                     if self.is_root:
                         print("Выход.")
-                        return "exit"  # Возвращаем команду для выхода
+                        break
                     else:
                         return
                 elif 0 < choice <= len(self.root_menu.sub_menu):
@@ -54,17 +50,11 @@ class Menu:
                     if selected_item.is_leaf():
                         selected_item.run()
                     else:
-                        # Создаем подменю
+                        # Обновляем навигационную цепочку для подменю
                         submenu = Menu(selected_item, is_root=False, breadcrumb=f"{self.breadcrumb} -> {selected_item.name}")
                         submenu.navigate(session)
                 else:
                     print("Неверный выбор.")
-                    input("Нажмите Enter для продолжения.")
             else:
                 print("Пожалуйста, введите число.")
-                input("Нажмите Enter для продолжения.")
 
-    def show_message(self):
-        """Пример метода для отображения сообщения."""
-        print("Этот метод был вызван!")
-        input("Нажмите Enter для продолжения...")
