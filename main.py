@@ -44,50 +44,58 @@ class Application:
 
     def run(self):
         """Запуск приложения."""
-        # Инициализация
-        self.initialize()
-        # Авторизация
-        self.authorize_user()
-        # Настройка меню
-        self.setup_menu()
+        try:
+            # Инициализация
+            self.initialize()
+            # Авторизация
+            self.authorize_user()
+            # Настройка меню
+            self.setup_menu()
 
-        current_menu = self.menu.root_menu  # Начинаем с главного меню
-        previous_menus = []  # Стек для хранения предыдущих уровней меню
-        breadcrumb = [current_menu]  # Хлебные крошки для навигации
+            current_menu = self.menu.root_menu  # Начинаем с главного меню
+            previous_menus = []  # Стек для хранения предыдущих уровней меню
+            breadcrumb = [current_menu]  # Хлебные крошки для навигации
 
-        # Основной цикл приложения
-        while True:
-            result = self.menu.navigate(current_menu, breadcrumb)
+            # Основной цикл приложения
+            while True:
+                try:
+                    result = self.menu.navigate(current_menu, breadcrumb)
+                except KeyboardInterrupt:
+                    # Вывести сообщение и предложить пользователю завершить работу
+                    print("\nЗавершить программу? (y/n): ", end="")
+                    choice = input().strip().lower()
+                    if choice == 'y':
+                        break
+                    else:
+                        continue
 
-            # Очистка экрана
-            Helper.clear_screen()
+                # Очистка экрана
+                Helper.clear_screen()
 
-            print(result.title)
-            print(result.action)
-
-            if result == 'exit':
-                # Если 0 было выбрано в главном меню — выход из программы
-                if not previous_menus:
-                    break
+                if result == 'exit':
+                    # Если 0 было выбрано в главном меню — выход из программы
+                    if not previous_menus:
+                        break
+                    else:
+                        # Если в подменю выбрали 0, возвращаемся на предыдущий уровень
+                        current_menu = previous_menus.pop()
+                        breadcrumb.pop()
+                        continue
+                elif isinstance(result, MenuItem):
+                    if result.is_leaf():
+                        # Если выбранный элемент — лист (нет подменю), то выполняем действие
+                        result.run()
+                    else:
+                        # Сохраняем текущее меню в стек и переходим в подменю
+                        previous_menus.append(current_menu)
+                        breadcrumb.append(result)
+                        current_menu = result
                 else:
-                    # Если в подменю выбрали 0, возвращаемся на предыдущий уровень
-                    current_menu = previous_menus.pop()
-                    breadcrumb.pop()
-                    continue
-            elif isinstance(result, MenuItem):
-                if result.is_leaf():
-                    # Если выбранный элемент — лист (нет подменю), то выполняем действие
-                    result.run()
-                else:
-                    # Сохраняем текущее меню в стек и переходим в подменю
-                    previous_menus.append(current_menu)
-                    breadcrumb.append(result)
-                    current_menu = result
-            else:
-                print("Неверный выбор, попробуйте снова.")
+                    print("Неверный выбор, попробуйте снова.")
 
-        # Закрытие сессии после завершения
-        self.db_manager.close_session(self.session)
+        finally:
+            # Закрытие сессии после завершения
+            self.db_manager.close_session(self.session)
 
 
 
