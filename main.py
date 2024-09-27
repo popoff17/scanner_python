@@ -1,4 +1,4 @@
-from db import DatabaseManager
+from db.db import DatabaseManager
 from user import User
 from menu import Menu, MenuItem
 #from parser import Parser

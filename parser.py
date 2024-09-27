@@ -2,7 +2,7 @@ import time
 import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin, urlparse
-from db import SEOData
+from db.db import SEOData
 
 
 class Parser:

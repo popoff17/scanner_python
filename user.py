@@ -1,8 +1,8 @@
 import os
 import getpass
 from sqlalchemy.orm import sessionmaker
-from db import DatabaseManager
-from tables import UserTable
+from db.db import DatabaseManager
+from db.tables import UserTable
 
 class User:
     def __init__(self):
