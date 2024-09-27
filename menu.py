@@ -1,60 +1,53 @@
 from helpers import Helper
 
 class MenuItem:
-    def __init__(self, name, action=None, sub_menu=None):
-        self.name = name
-        self.action = action
-        self.sub_menu = sub_menu
+    def __init__(self, title, action=None, sub_menu=None):
+        self.title = title  # Заголовок меню или пункта меню
+        self.action = action  # Действие, если элемент — лист
+        self.sub_menu = sub_menu or []  # Список подменю
 
     def is_leaf(self):
-        return self.sub_menu is None
+        """Проверяет, является ли элемент конечным (листом)."""
+        return self.action is not None
 
     def run(self):
-        if self.is_leaf():
-            if self.action:
-                self.action()
-        else:
-            self.show_sub_menu()  # Передаём breadcrumb при вызове
-
-    def show_sub_menu(self, breadcrumb):
-        Helper.clear_screen()
-        print(breadcrumb)  # Выводим навигационную цепочку
-        for i, item in enumerate(self.sub_menu):
-            print(f"{i + 1}. {item.name}")
-        print(f"0. Назад")
+        """Запускает действие, если это лист."""
+        if self.is_leaf() and self.action:
+            self.action()
 
 class Menu:
-    def __init__(self, root_menu, is_root=True, breadcrumb="Главное меню"):
+    def __init__(self, root_menu):
         self.root_menu = root_menu
-        self.is_root = is_root
-        self.breadcrumb = breadcrumb  # Храним навигационную цепочку
 
-    def navigate(self, session):
-        """Навигация по меню."""
-        while True:
-            Helper.clear_screen()
-            print(self.breadcrumb)  # Выводим текущую навигационную цепочку
-            self.root_menu.show_sub_menu(self.breadcrumb)  # Передаём breadcrumb
-            choice = input("Выберите действие: ")
+    def navigate(self, current_menu, breadcrumb):
+        """Выводит меню и возвращает выбор пользователя."""
 
-            if choice.isdigit():
-                choice = int(choice)
-                if choice == 0:
-                    if self.is_root:
-                        print("Выход.")
-                        break
-                    else:
-                        return
-                elif 0 < choice <= len(self.root_menu.sub_menu):
-                    selected_item = self.root_menu.sub_menu[choice - 1]
-                    if selected_item.is_leaf():
-                        selected_item.run()
-                    else:
-                        # Обновляем навигационную цепочку для подменю
-                        submenu = Menu(selected_item, is_root=False, breadcrumb=f"{self.breadcrumb} -> {selected_item.name}")
-                        submenu.navigate(session)
-                else:
-                    print("Неверный выбор.")
-            else:
-                print("Пожалуйста, введите число.")
+        # Печатаем навигационную цепочку
+        print(" > ".join([item.title for item in breadcrumb]))
 
+        # Печатаем заголовок текущего меню
+        print(f"=== {current_menu.title} ===")
+
+        # Печатаем список пунктов меню
+        for i, item in enumerate(current_menu.sub_menu, 1):
+            print(f"{i}. {item.title}")
+
+        # В главном меню пункт 0 должен быть "Выход", в подменю — "Назад"
+        if breadcrumb and current_menu == breadcrumb[0]:
+            print("0. Выход")
+        else:
+            print("0. Назад")
+
+        # Ожидаем выбор пользователя
+        choice = input("Выберите действие: ").strip()
+
+        # Обработка ввода
+        if choice.isdigit():
+            choice = int(choice)
+            if choice == 0:
+                return 'exit'
+            elif 1 <= choice <= len(current_menu.sub_menu):
+                return current_menu.sub_menu[choice - 1]
+
+        # Если выбор некорректен, возвращаем None
+        return None

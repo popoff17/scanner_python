@@ -53,10 +53,17 @@ class Application:
 
         current_menu = self.menu.root_menu  # Начинаем с главного меню
         previous_menus = []  # Стек для хранения предыдущих уровней меню
+        breadcrumb = [current_menu]  # Хлебные крошки для навигации
 
         # Основной цикл приложения
         while True:
-            result = self.menu.navigate(current_menu)
+            result = self.menu.navigate(current_menu, breadcrumb)
+
+            # Очистка экрана
+            Helper.clear_screen()
+
+            print(result.title)
+            print(result.action)
 
             if result == 'exit':
                 # Если 0 было выбрано в главном меню — выход из программы
@@ -65,6 +72,7 @@ class Application:
                 else:
                     # Если в подменю выбрали 0, возвращаемся на предыдущий уровень
                     current_menu = previous_menus.pop()
+                    breadcrumb.pop()
                     continue
             elif isinstance(result, MenuItem):
                 if result.is_leaf():
@@ -73,10 +81,14 @@ class Application:
                 else:
                     # Сохраняем текущее меню в стек и переходим в подменю
                     previous_menus.append(current_menu)
+                    breadcrumb.append(result)
                     current_menu = result
+            else:
+                print("Неверный выбор, попробуйте снова.")
 
         # Закрытие сессии после завершения
         self.db_manager.close_session(self.session)
+
 
 
 if __name__ == "__main__":
