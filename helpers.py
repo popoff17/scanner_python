@@ -10,6 +10,18 @@ class Helper:
         # Установим кодировку
         pass
 
+    def test_text(self):
+        print("TEST TEXT")
+
+    def getClassAndMethod(input_string):
+        # Разделяем строку по последней точке
+        before_dot, separator, after_dot = input_string.rpartition('.')
+        # Добавляем скобки к последней части (метод с вызовом)
+        after_dot_with_brackets = after_dot
+        # Возвращаем список из двух частей
+        return [before_dot, after_dot_with_brackets]
+
+
     @staticmethod
     def clear_screen():
         """Очищает экран, в зависимости от операционной системы."""
@@ -27,3 +39,14 @@ class Helper:
             sys.stdout.write(f"\rПрогресс: {progress}%")
             sys.stdout.flush()
         print("\nПрогресс: 100% Завершено.")
+
+    @staticmethod
+    def print_nested_array(arr, level=0):
+        for item in arr:
+            if isinstance(item, list):
+                print("  " * level + "[")
+                Helper.print_nested_array(item, level + 1)  # Вызов статического метода
+                print("  " * level + "]")
+            else:
+                print("  " * level + str(item))
+

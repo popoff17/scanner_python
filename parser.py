@@ -9,6 +9,14 @@ class Parser:
     def __init__(self, session):
         self.session = session
 
+    def set_domain(self, app):
+        print("устанавливаем сайт...")
+        time.sleep(1)
+        app.project_domain = "test"
+        app.update_menu(app.menu.root_menu)  # Обновление меню после изменения свойства
+        print("сайт установлен.")
+
+
     def analyze_css(self):
         print("Анализ CSS начат...")
         time.sleep(2)
