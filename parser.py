@@ -3,17 +3,19 @@ import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin, urlparse
 from db.db import SEOData
+from menu import MainMenu
 
 
 class Parser:
     def __init__(self, session):
         self.session = session
 
-    def set_domain(self, app):
+    def set_domain(self, app, project_domain=""):
         print("устанавливаем сайт...")
-        time.sleep(1)
-        app.project_domain = "test"
+        app.project_domain = project_domain
         print("сайт установлен.")
+        menuActive = ["Сбор всех страниц"]
+        app.menu.update_menu_item_active(app.menu.menu, menuActive)
 
 
     def analyze_css(self):

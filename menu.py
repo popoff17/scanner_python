@@ -15,7 +15,7 @@ class MainMenu:
                             {
                                 "title": "Установить домен",
                                 "active": "y",
-                                "action": "app.parser.set_domain(app)",
+                                "action": 'app.parser.set_domain(app, "ya.ru")',
                             },
                             {
                                 "title": "Сбор всех страниц",
@@ -25,7 +25,7 @@ class MainMenu:
                         ]
                     },
                     {
-                        "title": "Второй пнукт",
+                        "title": "Второй пункт",
                         "active": "n",
                         "childs": [
                             {
@@ -47,7 +47,8 @@ class MainMenu:
     def showMenu(self, menuTitle="", current_menu=None):
         # Если текущий элемент не задан, используем основное меню
         if current_menu is None:
-            current_menu = self.menu
+            #current_menu = self.menu
+            return False
         # Проверяем, если текущий элемент имеет искомый заголовок
         #if current_menu.get("title") == menuTitle and current_menu.get("active") == "y":
         if current_menu.get("title") == menuTitle and current_menu.get("active") == "y":
@@ -69,3 +70,25 @@ class MainMenu:
         return []  # Возвращаем пустой список, если ничего не найдено
 
 
+    def update_menu_item_active(self, menu, titles, new_active_value="y"):
+        # Проверяем, что titles — это список
+        if not isinstance(titles, list):
+            raise TypeError("titles должен быть списком, а получен: {}".format(type(titles)))
+
+        # Если titles пустой, возвращаем False
+        if not titles:
+            return False
+
+        # Проходим по каждому элементу в titles
+        for title in titles:
+            # Проверяем, если title совпадает с текущим пунктом меню
+            if menu.get("title") == title:
+                # Обновляем "active" для текущего пункта
+                menu["active"] = new_active_value
+
+            # Если есть дочерние элементы, рекурсивно проходим по ним
+            if "childs" in menu and isinstance(menu["childs"], list):
+                for child in menu["childs"]:
+                    self.update_menu_item_active(child, [title], new_active_value)
+
+        return True  # Возвращаем True, если успешно прошли по списку

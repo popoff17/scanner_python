@@ -77,7 +77,9 @@ class Application:
 
     def coreWorkFlow(self):
         # Выводим пункты меню
-        activeMenu = self.menu.showMenu(self.currentMenuTitle)
+        activeMenu = self.menu.showMenu(self.currentMenuTitle, self.menu.menu)
+        if activeMenu == False:
+            return False
         #проверка что вернула функция - действие или меню
         if isinstance(activeMenu, str):
             #вызов функции из меню сделали через eval() но пока что оставим проверку метода/класса
@@ -162,8 +164,7 @@ class Application:
                     self.printInfo()
                     if self.coreWorkFlow() == False:
                         break
-                    print("")
-                    input("Нажмите ENTER, чтобы продолжить")
+                    #input("Нажмите ENTER, чтобы продолжить")
                 except KeyboardInterrupt:
                     # Вывести сообщение и предложить пользователю завершить работу
                     print("\nЗавершить программу? (y/n): ", end="")
