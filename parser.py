@@ -13,7 +13,6 @@ class Parser:
         print("устанавливаем сайт...")
         time.sleep(1)
         app.project_domain = "test"
-        app.update_menu(app.menu.root_menu)  # Обновление меню после изменения свойства
         print("сайт установлен.")
 
 
