@@ -15,12 +15,12 @@ class MainMenu:
                             {
                                 "title": "Установить домен",
                                 "active": "y",
-                                "action": 'app.parser.set_domain(app, "ya.ru")',
+                                "action": 'app.parser.set_domain(app)',
                             },
                             {
                                 "title": "Сбор всех страниц",
                                 "active": "n",
-                                "action": "test()",
+                                "action": 'app.parser.get_all_pages(app)',
                             },
                         ]
                     },

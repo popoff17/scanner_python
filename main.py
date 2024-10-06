@@ -29,8 +29,14 @@ class Application:
     def authorize_user(self):
         """Авторизация пользователя."""
         while not self.user.username:
+            Helper.clear_screen()
             if self.user.authorize():
+                Helper.clear_screen()
+                Helper.print_message(f"Добро пожаловать, {self.user.username}", "Авторизация успешна!")
                 break
+            else:
+                Helper.clear_screen()
+                Helper.print_message("Неверный логин или пароль.")
 
     def show_message(self):
         """Пример действия для меню."""
@@ -149,6 +155,7 @@ class Application:
     def run(self):
         """Запуск приложения."""
         try:
+            Helper.clear_screen()
             # Инициализация
             self.initialize()
             # Авторизация

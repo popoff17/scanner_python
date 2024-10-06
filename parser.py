@@ -1,22 +1,30 @@
 import time
 import requests
+import re
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin, urlparse
 from db.db import SEOData
 from menu import MainMenu
-
+from helpers import Helper
 
 class Parser:
     def __init__(self, session):
         self.session = session
 
-    def set_domain(self, app, project_domain=""):
-        print("устанавливаем сайт...")
-        app.project_domain = project_domain
-        print("сайт установлен.")
-        menuActive = ["Сбор всех страниц"]
-        app.menu.update_menu_item_active(app.menu.menu, menuActive)
+    def set_domain(self, app):
+        domain = input("Введите URL сайта: ")
 
+        valid_domain = self.format_url(domain)
+        if valid_domain:
+            app.project_domain = valid_domain
+            app.menu.update_menu_item_active(app.menu.menu, ["Сбор всех страниц"])
+        else:
+            Helper.print_message("Домен не установлен!\nВведите корректный адрес сайта!")
+
+    def get_all_pages(self, app):
+        print("Анализ CSS начат...")
+        time.sleep(2)
+        print("Анализ CSS завершён.")
 
     def analyze_css(self):
         print("Анализ CSS начат...")
@@ -52,6 +60,35 @@ class Parser:
     def url_exists(self, url):
         return session.query(SEOData).filter_by(url=url).first() is not None
 
+
+    #Проверка домена
+    def is_valid_domain(self, domain):
+        # Проверка доменного имени на соответствие стандартам (RFC 1035)
+        domain_regex = re.compile(
+            r'^(?:[a-zA-Z0-9]'  # первая буква/цифра
+            r'(?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+'  # буквы/цифры/тире и точка
+            r'(?:[a-zA-Z]{2,})$'  # домен верхнего уровня (TLD)
+        )
+        return domain_regex.match(domain) is not None
+    #Проверка домена
+    def format_url(self, url):
+        # 1. Проверка на наличие протокола
+        if not re.match(r'^(http|https)://', url):
+            url = 'https://' + url
+        # 2. Парсим URL
+        parsed_url = urlparse(url)
+        # Проверяем валидность домена
+        if not self.is_valid_domain(parsed_url.netloc):
+            return False
+        # Оставляем только схему (протокол) и домен
+        formatted_url = f'{parsed_url.scheme}://{parsed_url.netloc}/'
+        # 3. Добавляем слэш на конце
+        if not formatted_url.endswith('/'):
+            formatted_url += '/'
+        return formatted_url
+
+
+    #Парсинг страниц
     def scrape_page(self, url, depth=2, visited=set()):
         if depth < 0 or url in visited:
             return  # Прекращаем рекурсию, если глубина меньше 0 или URL уже посещен
@@ -88,6 +125,3 @@ class Parser:
         except Exception as e:
             print(f"Ошибка при обработке {url}: {e}")
 
-    def set_page(self):
-        url = input("Введите URL сайта: ")
-        self.scrape_page(url)  # Запускаем парсинг для введённого URL
