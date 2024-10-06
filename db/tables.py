@@ -20,17 +20,22 @@ class UserTable(Base):
     password = Column(String)
     name = Column(String)
     # Связь с таблицей another_table (один ко многим) с каскадным удалением
-    another_data = relationship("AnotherTable", back_populates="user", cascade="all, delete")
+    another_data = relationship("SitesTable", back_populates="user", cascade="all, delete")
 
-# Класс для таблицы AnotherTable
-class AnotherTable(Base):
-    __tablename__ = 'another_table'
+# Класс для таблицы sites
+class SitesTable(Base):
+    __tablename__ = 'sites'
     id = Column(Integer, primary_key=True)
-    data = Column(String)
     # Внешний ключ на id из таблицы users с каскадным удалением
     user_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'))
+    url = Column(String)
+
     # Связь с таблицей users (многие к одному)
     user = relationship("UserTable", back_populates="another_data")
+
+
+
+
 
 
 

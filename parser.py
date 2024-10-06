@@ -3,21 +3,36 @@ import requests
 import re
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin, urlparse
-from db.db import SEOData
+from db.db import SEOData, SitesTable
 from menu import MainMenu
 from helpers import Helper
 
 class Parser:
-    def __init__(self, session):
-        self.session = session
+    def __init__(self, app):
+        self.session = app.session
 
     def set_domain(self, app):
+        #получение всех сайтов пользователя
         domain = input("Введите URL сайта: ")
-
         valid_domain = self.format_url(domain)
         if valid_domain:
-            app.project_domain = valid_domain
-            app.menu.update_menu_item_active(app.menu.menu, ["Сбор всех страниц"])
+            user_sites = self.session.query(SitesTable).filter(SitesTable.user_id == app.user.user_id).all()
+            check_site = self.session.query(SitesTable).filter(SitesTable.user_id == app.user.user_id, SitesTable.url == domain).one()
+            if check_site:
+                app.project_domain = check_site.url
+            else:
+                seo_entry = SitesTable(
+                    user_id=app.user.user_id,
+                    url=valid_domain,
+                )
+                try:
+                    self.session.add(seo_entry)
+                    self.session.commit()
+                except Exception as e:
+                    self.session.rollback()
+
+                app.project_domain = valid_domain
+                app.menu.update_menu_item_active(app.menu.menu, ["Сбор всех страниц"])
         else:
             Helper.print_message("Домен не установлен!\nВведите корректный адрес сайта!")
 

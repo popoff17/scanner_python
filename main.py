@@ -24,7 +24,7 @@ class Application:
     def initialize(self):
         """Инициализация базы данных и всех компонентов."""
         self.session = self.db_manager.initialize_db()  # Инициализируем базу данных
-        self.parser = Parser(self.session)
+        self.parser = Parser(self)
 
     def authorize_user(self):
         """Авторизация пользователя."""
@@ -155,6 +155,9 @@ class Application:
 
 
     def run(self):
+
+
+
         """Запуск приложения."""
         try:
             Helper.clear_screen()

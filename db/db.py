@@ -1,7 +1,7 @@
 import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from .tables import Base, SEOData, AnotherTable, UserTable  # Импортируйте все нужные классы из файла tables
+from .tables import Base, SEOData, SitesTable, UserTable  # Импортируйте все нужные классы из файла tables
 
 class DatabaseManager:
     data_folder = 'data'
