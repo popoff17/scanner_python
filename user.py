@@ -14,7 +14,7 @@ class User:
         #Helper.clear_screen()
         print("=== Авторизация ===")
         username = input("Введите логин: ")
-        password = getpass.getpass("Введите пароль: ")
+        password = Helper.encode_md5(getpass.getpass("Введите пароль: "))
 
         # Проверка пользователя в базе данных
         user = self.session.query(UserTable).filter_by(username=username, password=password).first()

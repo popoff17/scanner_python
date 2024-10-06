@@ -2,6 +2,7 @@ import os
 import sys
 import time
 import re
+import hashlib
 
 class Helper:
     def __init__(self):
@@ -13,6 +14,12 @@ class Helper:
 
     def test_text(self):
         print("TEST TEXT")
+
+    def encode_md5(input_string):
+        # Преобразуем строку в байты и создаем объект хеша MD5
+        md5_hash = hashlib.md5(input_string.encode())
+        # Получаем строку с хешем в шестнадцатеричном формате
+        return md5_hash.hexdigest()
 
     def print_message(message, error_title="ОШИБКА!"):
         continue_message = "Нажмите ENTER для продолжения"

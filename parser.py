@@ -21,6 +21,7 @@ class Parser:
         else:
             Helper.print_message("Домен не установлен!\nВведите корректный адрес сайта!")
 
+
     def get_all_pages(self, app):
         print("Анализ CSS начат...")
         time.sleep(2)

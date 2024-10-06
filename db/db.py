@@ -34,8 +34,8 @@ class DatabaseManager:
 
             # Добавляем пользователей в таблицу UserTable
             initial_users = [
-                UserTable(username='1', password='1', name='AAAAdmin'),
-                UserTable(username='qwe', password='123', name='Admin'),
+                UserTable(username='1', password='c4ca4238a0b923820dcc509a6f75849b', name='AAAAdmin'),
+                UserTable(username='qwe', password='202cb962ac59075b964b07152d234b70', name='Admin'),
             ]
             session.add_all(initial_users)
             session.commit()
