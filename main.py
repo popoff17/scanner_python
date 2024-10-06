@@ -146,6 +146,8 @@ class Application:
 
     def printInfo(self):
         print("********************************")
+        if self.user.username:
+            print("Пользователь: " + self.user.username)
         if self.project_domain:
             print("Установленный домен: " + self.project_domain)
         print("********************************")
