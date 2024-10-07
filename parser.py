@@ -11,6 +11,7 @@ class Parser:
     def __init__(self, app):
         self.session = app.session
 
+    #устанавливаем домен сайта для работы
     def set_domain(self, app):
         #получение всех сайтов пользователя
         set_site = False
@@ -46,12 +47,12 @@ class Parser:
                         set_site = True
                     except Exception as e:
                         self.session.rollback()
-
         if set_site:
             app.project_domain = valid_domain
             app.menu.update_menu_item_active(app.menu.menu, ["Сбор всех страниц"])
         else:
             Helper.print_message("Домен не установлен!\nВведите корректный адрес сайта!")
+
 
 
     def get_all_pages(self, app):

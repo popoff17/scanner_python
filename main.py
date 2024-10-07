@@ -194,6 +194,7 @@ class Application:
             self.db_manager.close_session(self.session)
 
 
+
 if __name__ == "__main__":
     app = Application()
     app.run()
