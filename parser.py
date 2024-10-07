@@ -13,26 +13,43 @@ class Parser:
 
     def set_domain(self, app):
         #получение всех сайтов пользователя
-        domain = input("Введите URL сайта: ")
-        valid_domain = self.format_url(domain)
-        if valid_domain:
-            user_sites = self.session.query(SitesTable).filter(SitesTable.user_id == app.user.user_id).all()
-            check_site = self.session.query(SitesTable).filter(SitesTable.user_id == app.user.user_id, SitesTable.url == domain).one()
-            if check_site:
-                app.project_domain = check_site.url
-            else:
-                seo_entry = SitesTable(
-                    user_id=app.user.user_id,
-                    url=valid_domain,
-                )
-                try:
-                    self.session.add(seo_entry)
-                    self.session.commit()
-                except Exception as e:
-                    self.session.rollback()
+        set_site = False
+        user_sites = self.session.query(SitesTable).filter(SitesTable.user_id == app.user.user_id).all()
+        if user_sites:
+            titles = {}
+            counter = 1
+            for item in user_sites:
+                titles[counter] = item.url
+                print(str(counter) + " - " + item.url)
+                counter += 1
 
-                app.project_domain = valid_domain
-                app.menu.update_menu_item_active(app.menu.menu, ["Сбор всех страниц"])
+        domain = input("Введите URL сайта или номер из списка: ")
+        if domain.isdigit() and int(domain) <= counter and int(domain) > 0:
+            if titles[int(domain)]:
+                valid_domain = titles[int(domain)]
+                set_site = True
+        else:
+            valid_domain = self.format_url(domain)
+            if valid_domain:
+                check_site = self.session.query(SitesTable).filter(SitesTable.user_id == app.user.user_id, SitesTable.url == domain).one_or_none()
+                if check_site:
+                    valid_domain = check_site.url
+                    set_site = True
+                else:
+                    seo_entry = SitesTable(
+                        user_id=app.user.user_id,
+                        url=valid_domain,
+                    )
+                    try:
+                        self.session.add(seo_entry)
+                        self.session.commit()
+                        set_site = True
+                    except Exception as e:
+                        self.session.rollback()
+
+        if set_site:
+            app.project_domain = valid_domain
+            app.menu.update_menu_item_active(app.menu.menu, ["Сбор всех страниц"])
         else:
             Helper.print_message("Домен не установлен!\nВведите корректный адрес сайта!")
 
