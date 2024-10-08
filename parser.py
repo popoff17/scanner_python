@@ -11,7 +11,7 @@ class Parser:
     def __init__(self, app):
         self.session = app.session
 
-    #устанавливаем домен сайта для работы
+    #устанавливаем домен сайта для работыzz
     def set_domain(self, app):
         #получение всех сайтов пользователя
         set_site = False
@@ -23,14 +23,13 @@ class Parser:
                 titles[counter] = item.url
                 print(str(counter) + " - " + item.url)
                 counter += 1
-
         domain = input("Введите URL сайта или номер из списка: ")
         if domain.isdigit() and int(domain) <= counter and int(domain) > 0:
             if titles[int(domain)]:
                 valid_domain = titles[int(domain)]
                 set_site = True
         else:
-            valid_domain = self.format_url(domain)
+            valid_domain = self.format_url(app, domain)
             if valid_domain:
                 check_site = self.session.query(SitesTable).filter(SitesTable.user_id == app.user.user_id, SitesTable.url == domain).one_or_none()
                 if check_site:
@@ -105,10 +104,13 @@ class Parser:
         )
         return domain_regex.match(domain) is not None
     #Проверка домена
-    def format_url(self, url):
+    def format_url(self, app, url):
         # 1. Проверка на наличие протокола
         if not re.match(r'^(http|https)://', url):
-            url = 'https://' + url
+            if app.config['parser']['https_only']=='Y':
+                url = 'https://' + url
+            else:
+                url = 'http://' + url
         # 2. Парсим URL
         parsed_url = urlparse(url)
         # Проверяем валидность домена

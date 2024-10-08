@@ -1,5 +1,6 @@
 import sys
 import pprint
+import configparser
 from db.db import DatabaseManager
 from user import User
 from menu import MainMenu
@@ -10,6 +11,7 @@ from helpers import Helper  # Импортируем класс Helper для о
 class Application:
     def __init__(self):
         self.db_manager = DatabaseManager()  # Создаем объект для управления базой данных
+        self.config = None
         self.session = None
         self.user = User()
         self.menu = MainMenu(self)
@@ -23,8 +25,18 @@ class Application:
 
     def initialize(self):
         """Инициализация базы данных и всех компонентов."""
+        self.config = self.read_config()
         self.session = self.db_manager.initialize_db()  # Инициализируем базу данных
         self.parser = Parser(self)
+
+    def read_config(self):
+        config = configparser.ConfigParser()
+        config.read('config.ini')
+        config_data = {}
+        for section in config.sections():
+            config_data[section] = dict(config.items(section))  # Преобразуем каждый раздел в словарь
+        return config_data
+
 
     def authorize_user(self):
         """Авторизация пользователя."""
