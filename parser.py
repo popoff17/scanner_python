@@ -55,9 +55,12 @@ class Parser:
 
 
     def get_all_pages(self, app):
-        print("Анализ CSS начат...")
+        self.scrape_page(app.project_domain, 2)
+        print("Сбор страниц сайта...")
         time.sleep(2)
-        print("Анализ CSS завершён.")
+        print("Сбор страниц сайта завершён.")
+
+
 
     def analyze_css(self):
         print("Анализ CSS начат...")
@@ -91,7 +94,7 @@ class Parser:
         return urlparse(link).netloc == urlparse(base_url).netloc
 
     def url_exists(self, url):
-        return session.query(SEOData).filter_by(url=url).first() is not None
+        return self.session.query(SEOData).filter_by(url=url).first() is not None
 
 
     #Проверка домена
@@ -128,25 +131,20 @@ class Parser:
     def scrape_page(self, url, depth=2, visited=set()):
         if depth < 0 or url in visited:
             return  # Прекращаем рекурсию, если глубина меньше 0 или URL уже посещен
-
         visited.add(url)  # Добавляем URL в множество посещенных
-
         try:
             response = requests.get(url)
             soup = BeautifulSoup(response.content, 'html.parser')
-
             # Собираем основную информацию о странице
             data = {
                 'url': url,
                 'title': soup.title.string if soup.title else None,
             }
-
             # Проверяем, существует ли URL в базе, если нет, сохраняем
             if not self.url_exists(url):
                 self.save_to_sqlalchemy(data)  # Сохраняем данные через SQLAlchemy
             else:
                 print(f"URL {url} уже существует в базе данных.")
-
             # Если глубина больше 0, продолжаем парсинг по внутренним ссылкам
             if depth > 0:
                 links = []
@@ -154,10 +152,8 @@ class Parser:
                     full_url = urljoin(url, a['href'])
                     if self.is_internal_link(url, full_url):  # Проверяем, является ли ссылка внутренней
                         links.append(full_url)
-
                 for link in links:
                     self.scrape_page(link, depth - 1, visited)  # Передаем множество посещенных ссылок
-
         except Exception as e:
-            print(f"Ошибка при обработке {url}: {e}")
+            Helper.print_message(f"Ошибка при обработке {url}: {e}")
 

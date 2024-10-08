@@ -166,10 +166,11 @@ class Application:
         print("")
 
 
+
+
+
+
     def run(self):
-
-
-
         """Запуск приложения."""
         try:
             Helper.clear_screen()
@@ -178,7 +179,6 @@ class Application:
             # Авторизация
             self.authorize_user()
             # Настройка меню
-
             # Инициализируем стек для истории меню
             self.menuHistory = []
             while True:
@@ -197,13 +197,12 @@ class Application:
                         break
                     else:
                         continue
-
             #pprint.pprint(menu)
             #sys.exit(1)
-
         finally:
             # Закрытие сессии после завершения
             self.db_manager.close_session(self.session)
+
 
 
 
