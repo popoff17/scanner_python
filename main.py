@@ -5,7 +5,7 @@ from db.db import DatabaseManager
 from user import User
 from menu import MainMenu
 from parser import Parser
-from helpers import Helper  # Импортируем класс Helper для очистки экрана
+from helper import Helper
 
 
 class Application:
@@ -18,7 +18,7 @@ class Application:
         self.currentMenuTitle = "Главное меню"
         self.prevMenuTitle = ""
         self.action = ""
-        self.helper = Helper()  # Создаем объект Helper для очистки экрана
+        #self.helper = Helper()  # Создаем объект Helper для очистки экрана
         self.parser = None
         self.project_domain = ""  # тут хранится домен сайта для парсинга, наш проект
 

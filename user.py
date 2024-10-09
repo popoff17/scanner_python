@@ -3,7 +3,7 @@ import getpass
 from sqlalchemy.orm import sessionmaker
 from db.db import DatabaseManager
 from db.tables import UserTable
-from helpers import Helper
+from helper import Helper
 
 class User:
     def __init__(self):

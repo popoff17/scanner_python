@@ -1,4 +1,4 @@
-from helpers import Helper
+from helper import Helper
 
 class MainMenu:
     def __init__(self, title=None, action=None):

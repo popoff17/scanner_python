@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 from urllib.parse import urljoin, urlparse
 from db.db import SEOData, SitesTable
 from menu import MainMenu
-from helpers import Helper
+from helper import Helper
 
 class Parser:
     def __init__(self, app):
@@ -53,29 +53,19 @@ class Parser:
             Helper.print_message("Домен не установлен!\nВведите корректный адрес сайта!")
 
 
-
     def get_all_pages(self, app):
         self.scrape_page(app.project_domain, 2)
-        print("Сбор страниц сайта...")
         time.sleep(2)
-        print("Сбор страниц сайта завершён.")
+        Helper.print_message("Сбор страниц сайта завершён.","")
 
 
 
-    def analyze_css(self):
-        print("Анализ CSS начат...")
-        time.sleep(2)
-        print("Анализ CSS завершён.")
 
-    def analyze_js(self):
-        print("Анализ JS начат...")
-        time.sleep(2)
-        print("Анализ JS завершён.")
 
-    def process_site(self):
-        print("Обрабатываем сайт полностью...")
-        time.sleep(3)
-        print("Обработка завершена.")
+
+
+
+
 
     def save_to_sqlalchemy(self, data):
         seo_entry = SEOData(
@@ -90,22 +80,6 @@ class Parser:
             self.session.rollback()
             print(f"Ошибка при сохранении данных: {e}")
 
-    def is_internal_link(self, base_url, link):
-        return urlparse(link).netloc == urlparse(base_url).netloc
-
-    def url_exists(self, url):
-        return self.session.query(SEOData).filter_by(url=url).first() is not None
-
-
-    #Проверка домена
-    def is_valid_domain(self, domain):
-        # Проверка доменного имени на соответствие стандартам (RFC 1035)
-        domain_regex = re.compile(
-            r'^(?:[a-zA-Z0-9]'  # первая буква/цифра
-            r'(?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+'  # буквы/цифры/тире и точка
-            r'(?:[a-zA-Z]{2,})$'  # домен верхнего уровня (TLD)
-        )
-        return domain_regex.match(domain) is not None
     #Проверка домена
     def format_url(self, app, url):
         # 1. Проверка на наличие протокола
@@ -117,7 +91,12 @@ class Parser:
         # 2. Парсим URL
         parsed_url = urlparse(url)
         # Проверяем валидность домена
-        if not self.is_valid_domain(parsed_url.netloc):
+        domain_regex = re.compile(
+            r'^(?:[a-zA-Z0-9]'  # первая буква/цифра
+            r'(?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+'  # буквы/цифры/тире и точка
+            r'(?:[a-zA-Z]{2,})$'  # домен верхнего уровня (TLD)
+        )
+        if not domain_regex.match(parsed_url.netloc) is not None:
             return False
         # Оставляем только схему (протокол) и домен
         formatted_url = f'{parsed_url.scheme}://{parsed_url.netloc}/'
@@ -141,7 +120,7 @@ class Parser:
                 'title': soup.title.string if soup.title else None,
             }
             # Проверяем, существует ли URL в базе, если нет, сохраняем
-            if not self.url_exists(url):
+            if not Helper.url_exists(self.session, url):
                 self.save_to_sqlalchemy(data)  # Сохраняем данные через SQLAlchemy
             else:
                 print(f"URL {url} уже существует в базе данных.")
@@ -150,10 +129,11 @@ class Parser:
                 links = []
                 for a in soup.find_all('a', href=True):
                     full_url = urljoin(url, a['href'])
-                    if self.is_internal_link(url, full_url):  # Проверяем, является ли ссылка внутренней
+                    if Helper.is_internal_link(url, full_url):  # Проверяем, является ли ссылка внутренней
                         links.append(full_url)
                 for link in links:
                     self.scrape_page(link, depth - 1, visited)  # Передаем множество посещенных ссылок
         except Exception as e:
             Helper.print_message(f"Ошибка при обработке {url}: {e}")
+
 

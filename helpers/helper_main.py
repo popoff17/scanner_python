@@ -4,16 +4,13 @@ import time
 import re
 import hashlib
 
-class Helper:
+class HelperMain:
     def __init__(self):
         pass  # Здесь можно добавить начальные параметры, если они понадобятся
 
-    def set_encoding(self):
+    #def set_encoding(self):
         # Установим кодировку
-        pass
-
-    def test_text(self):
-        print("TEST TEXT")
+        #pass
 
     def encode_md5(input_string):
         # Преобразуем строку в байты и создаем объект хеша MD5
@@ -40,6 +37,7 @@ class Helper:
         message_lines = [f"# {' ' * padding}{line.ljust(max_length - padding * 2)}{' ' * padding} #" for line in message_lines]
         continue_line = f"# {' ' * padding}{continue_message.center(max_length - padding * 2)}{' ' * padding} #"
         # Печатаем результат
+        print()
         print(border)
         print(empty_line)
         print(title_line)
@@ -75,26 +73,4 @@ class Helper:
         """Очищает экран, в зависимости от операционной системы."""
         os.system('cls' if os.name == 'nt' else 'clear')
 
-    def format_url(self, url):
-        """Форматирует URL. Если URL не начинается с http, добавляет префикс http://"""
-        return url if url.startswith('http') else f'http://{url}'
-
-    def progress_bar(self, seconds):
-        """Выводит прогресс-бар в консоли на указанное количество секунд."""
-        for i in range(seconds):
-            time.sleep(1)
-            progress = int((i + 1) / seconds * 100)
-            sys.stdout.write(f"\rПрогресс: {progress}%")
-            sys.stdout.flush()
-        print("\nПрогресс: 100% Завершено.")
-
-    @staticmethod
-    def print_nested_array(arr, level=0):
-        for item in arr:
-            if isinstance(item, list):
-                print("  " * level + "[")
-                Helper.print_nested_array(item, level + 1)  # Вызов статического метода
-                print("  " * level + "]")
-            else:
-                print("  " * level + str(item))
 
