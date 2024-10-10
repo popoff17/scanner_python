@@ -40,7 +40,8 @@ class HelperMain:
         print()
         print(border)
         print(empty_line)
-        print(title_line)
+        if error_title != "":
+            print(title_line)
         for line in message_lines:
             print(line)
         print(empty_line)

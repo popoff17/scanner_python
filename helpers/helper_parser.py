@@ -1,5 +1,6 @@
 from db.db import SEOData, SitesTable
 from urllib.parse import urlparse
+import requests
 
 class HelperParser:
     def __init__(self):
@@ -12,3 +13,14 @@ class HelperParser:
     @staticmethod
     def url_exists(session, url):
         return session.query(SEOData).filter_by(url=url).first() is not None
+
+    @staticmethod
+    def checkSite(url):
+        try:
+            response = requests.get(url)
+            if response.status_code == 200:
+                return True
+            else:
+                return False
+        except requests.exceptions.RequestException as e:
+            return False

@@ -11,7 +11,7 @@ class Parser:
     def __init__(self, app):
         self.session = app.session
 
-    #устанавливаем домен сайта для работыzz
+    #устанавливаем домен сайта для работы
     def set_domain(self, app):
         #получение всех сайтов пользователя
         set_site = False
@@ -52,15 +52,13 @@ class Parser:
         else:
             Helper.print_message("Домен не установлен!\nВведите корректный адрес сайта!")
 
-
+    #Сбор всех страниц сайта
     def get_all_pages(self, app):
-        self.scrape_page(app.project_domain, 2)
-        time.sleep(2)
-        Helper.print_message("Сбор страниц сайта завершён.","")
-
-
-
-
+        if Helper.checkSite(app.project_domain):
+            self.scrape_page(app.project_domain, 2)
+            Helper.print_message("Сбор страниц сайта завершён.","")
+        else:
+            Helper.print_message("Сайт не вернул 200 код.\nСбор страниц не будет осуществлен.")
 
 
 
